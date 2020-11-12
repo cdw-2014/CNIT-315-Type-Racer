@@ -3,3 +3,5 @@ A Type Racer clone written in ANSI C for CNIT 315 at Purdue University Fall 2020
 
 Team Members:
 Alex Orzel
+CJ Weaver
+Connor Hetzler
