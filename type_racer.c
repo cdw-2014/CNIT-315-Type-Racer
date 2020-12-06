@@ -210,15 +210,10 @@ char** getPassage() {
     curl_global_cleanup();
     // ['rhryhgr e','erg','ergerg','asdasd arf ase r']
 
-    printf("1");
     char results[4][300] = {"","","",""};
-    printf("1");
     char unparsed[1200] = "";
-    printf("1");
     strcpy(unparsed, *(chunk.memory));
-    printf("1");
     char *token = strtok(unparsed, "\",\"");
-    printf("1");
     int index = 0;
     while (token != NULL) {
         token = strtok(NULL, "\",\"");
