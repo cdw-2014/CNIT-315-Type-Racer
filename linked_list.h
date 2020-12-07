@@ -1,13 +1,3 @@
-/*
-Name: CJ Weaver
-Email: weave114@purdue.edu
-Lab Time: Friday 12:30-1:20
-
-Lab 4
-
-
-*/
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
