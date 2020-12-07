@@ -19,37 +19,56 @@ typedef struct Score {
     struct Score* next;
 } Score;
 */
-char quotes[2][200] = { 
-                    "Your time is limited, so don't waste it living someone else's life.",
-                    "The way to get started"};
+
+typedef struct Passages {
+    char arr[4][300];
+} Passages;
 
 /* Function Prototypes */
 int getMenuInput();
 int calculateDistance(char*, char*);
 int min(int, int, int);
 void drawGame(int*, int*);
-char** getPassage();
-Score* gameLoop();
+Passages *getPassages();
+Score* gameLoop(char[4][300]);
 Score* getScores();
 void saveScore(Score*);
 
+char title[7][121] = {
+    " #######                        ######                                             #    #     #  #####  ###     #####  ",
+    "    #    #   # #####  ######    #     #   ##    ####  ###### #####                # #   ##    # #     #  #     #     # ",
+    "    #     # #  #    # #         #     #  #  #  #    # #      #    #              #   #  # #   # #        #     #       ",
+    "    #      #   #    # #####     ######  #    # #      #####  #    #    #####    #     # #  #  #  #####   #     #       ",
+    "    #      #   #####  #         #   #   ###### #      #      #####              ####### #   # #       #  #     #       ",
+    "    #      #   #      #         #    #  #    # #    # #      #   #              #     # #    ## #     #  #     #     # ",
+    "    #      #   #      ######    #     # #    #  ####  ###### #    #             #     # #     #  #####  ###     #####  "
+};
+
 int main() {
-    char** passage = getPassage();
+    for (int i = 0; i < 7; i++) {
+        printf("%s\n",title[i]);
+    }
     Score *head = (Score*) malloc(sizeof(Score));
     head = getScores();
-    int menuSelection = getMenuInput();
-    switch (menuSelection)
-    {
-    case 1: ;
-        Score *score = (Score*) malloc(sizeof(Score));
-        score = gameLoop();
-        saveScore(score);
-        break;
-    case 2:
-        return EXIT_SUCCESS;
-    default:
-        break;
-    }
+    do {
+        int menuSelection = getMenuInput();
+        switch (menuSelection)
+        {
+        case 1: ;
+            Score *score = (Score*) malloc(sizeof(Score));
+            Passages *passages = getPassages();
+            score = gameLoop(passages->arr);
+            saveScore(score);
+            break;
+        case 2: ;
+            traverse(head, TRUE);
+            break;
+        case 3:
+            return EXIT_SUCCESS;
+        default:
+            return EXIT_SUCCESS;
+        }
+    } while(TRUE);
     return EXIT_SUCCESS;
 }
 
@@ -120,12 +139,12 @@ int getMenuInput() {
     do {
         printf("\n\nSelect an option:\n");
         printf("1 - Start New Game\n");
-        printf("2 - Quit\n");
-        scanf("%d", &selection);
-        if (selection == 1 || selection == 2) {
-            isValid = TRUE;
+        printf("2 - View Past Scores\n");
+        printf("3 - Quit\n");
+        if (scanf("%d", &selection) == 1) {
+            break;
         } else {
-            printf("Invalid input. Please Try again. Enter 1 or 2.\n\n");
+            printf("\nInvalid input. Please enter 1, 2, or 3.\n");
         }
     } while (!isValid);
     return selection;
@@ -186,7 +205,7 @@ static size_t writeCallback(void *contents, size_t size, size_t nmemb, void *use
 }
 
 //REST API call or pull from static list
-char** getPassage() {
+Passages *getPassages() {
     CURL *curl;
     CURLcode res;
     struct Quote chunk;
@@ -194,7 +213,7 @@ char** getPassage() {
     chunk.size = 0;    /* no data at this point */
     curl = curl_easy_init();
     if (curl) {
-        curl_easy_setopt(curl, CURLOPT_URL, "http://localhost:3000/random/4");
+        curl_easy_setopt(curl, CURLOPT_URL, "https://cnit-315-quotes-api.herokuapp.com/random/5");
         curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, writeCallback);
         curl_easy_setopt(curl, CURLOPT_WRITEDATA, (void *)&chunk);
         res = curl_easy_perform(curl);
@@ -208,26 +227,30 @@ char** getPassage() {
         curl_easy_cleanup(curl);
     }
     curl_global_cleanup();
-    // ['rhryhgr e','erg','ergerg','asdasd arf ase r']
 
-    char results[4][300] = {"","","",""};
-    char unparsed[1200] = "";
-    strcpy(unparsed, *(chunk.memory));
-    char *token = strtok(unparsed, "\",\"");
+    char string[strlen(chunk.memory)];
+    char result[4][300];
+    strcpy(string, chunk.memory);
     int index = 0;
-    while (token != NULL) {
-        token = strtok(NULL, "\",\"");
-        strcpy(results[index], *token);
+    memmove (string, string+2, strlen (string+1) + 1);
+    while (index < 4) {
+        char *separator = strstr(string, "\",\"");
+        if (separator != NULL) {
+            separator[0] = '\0';
+            strcpy(result[index], string);
+            strcpy(string, separator+3);
+        }
         index++;
     }
-    printf("\n\n\n");
-    printf("%s", results[0]);
-    printf("%s", results[1]);
-    return &(results);
+    Passages *passages = (Passages*) malloc(sizeof(Passages));
+    strcpy(passages->arr[0], result[0]);
+    strcpy(passages->arr[1], result[1]);
+    strcpy(passages->arr[2], result[2]);
+    strcpy(passages->arr[3], result[3]);
+   return passages;
 }
 
-Score* gameLoop() {
-    //char passages[4][300] = getPassage();
+Score* gameLoop(char quotes[4][300]) {
     int count = 0; // count of passages completed
     int totalMistakes = 0;
     int score = 0;
@@ -236,7 +259,7 @@ Score* gameLoop() {
     int c;
     char* p;
     while((c = getchar()) != '\n' && c != EOF);
-    while (count < 2) {
+    while (count < 4) {
         drawGame(&count, &score);
         quoteLength += strlen(quotes[count]);
         char input[200] = "";
@@ -246,7 +269,7 @@ Score* gameLoop() {
         if ((p=strchr(input, '\n')) != NULL) // Checks for new line character (enter key) and assigns pointer to it
             *p = '\0'; // Assigns the string termination character to the end of the input
         time_t finishTime = time(0);
-        time_t elapsedTime = finishTime-startTime;
+        time_t elapsedTime = finishTime-startTime+1;
         printf("Time: %ld\n", elapsedTime);
         totalTime += elapsedTime;
 
@@ -257,7 +280,7 @@ Score* gameLoop() {
         count++;
         /* Calculate score */
         // (strlen / time)*100 - mistakes
-        score += (1000 - 20 * (runMistakes * elapsedTime));
+        score += ceil((2000 + 500*((quoteLength/elapsedTime) - (200/60))) * (    quoteLength - (2 * runMistakes)    )/quoteLength);
     }
     drawGame(&count, &score);
     printf("Total Time: %ld\n", totalTime);
@@ -289,7 +312,7 @@ Score* getScores() {
         }
     }
     fclose(scoreFile);
-    traverse(head, TRUE);
+    traverse(head, FALSE);
     return head;
 }
 

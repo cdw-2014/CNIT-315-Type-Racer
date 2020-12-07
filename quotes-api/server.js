@@ -88,7 +88,7 @@ let quotes = [
     "When hungry, eat your rice; when tired, close your eyes. Fools may laugh at me, but wise men will know what I mean.",
     "Most people are bothered by those passages of Scripture they do not understand, but the passages that bother me are those I do understand.",
     "It is by the goodness of God that in our country we have those three unspeakably precious things: freedom of speech, freedom of conscience, and the prudence never to practice either of them.",
-    "A complex system that does not work is invariably found to have  from a simpler system that worked just fine.",
+    "A complex system that works is invariably found to have evolved from a simple system that works.",
     "The opposite of a correct statement is a false statement. But the opposite of a profound truth may well be another profound truth.",
     "Insane people are always sure that they are fine. It is only the sane people who are willing to admit that they are crazy.",
     "There is no greater impotence in all the world like knowing you are right and that the wave of the world is wrong, yet the wave crashes upon you.",
